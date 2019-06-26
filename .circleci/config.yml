@@ -4,6 +4,8 @@ jobs:
   docker-build-push:
     docker:
     - image: docker:stable
+      environment:
+        TRON_VERSION: 3.6.0
     
     steps:
     - checkout
@@ -15,8 +17,18 @@ jobs:
     # build and push image to docker hub
     - run: |
         docker login -u $DOCKER_LOGIN -p $DOCKER_PWD > /dev/null 2>&1
-        docker build -t gettyio/tron-node:$CIRCLE_BRANCH .
-        docker push gettyio/tron-node:$CIRCLE_BRANCH
+        docker build --build-arg TRON_VERSION=$TRON_VERSION -t gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH .
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 gettyio/$CIRCLE_PROJECT_REPONAME:latest
+          docker push gettyio/$CIRCLE_PROJECT_REPONAME:latest
+          docker tag gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 gettyio/$CIRCLE_PROJECT_REPONAME:$TRON_VERSION
+          docker push gettyio/$CIRCLE_PROJECT_REPONAME:$TRON_VERSION
+        else
+          docker tag gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+          docker push gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BRANCH
+          docker tag gettyio/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 gettyio/$CIRCLE_PROJECT_REPONAME:$TRON_VERSION-$CIRCLE_BRANCH
+          docker push gettyio/$CIRCLE_PROJECT_REPONAME:$TRON_VERSION-$CIRCLE_BRANCH
+        fi
 
 workflows:
   version: 2

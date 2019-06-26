@@ -1,5 +1,10 @@
 FROM frolvlad/alpine-java:jdk8-full as build
 
+ARG TRON_VERSION
+
+RUN echo "Tron Version: v${TRON_VERSION}" \
+    && if [[ "${TRON_VERSION}" == "" ]]; then echo "TRON_VERSION environment variable must be set"; exit 1; fi
+
 ENV TRON_PATH=/opt/tron
 
 USER root
@@ -24,7 +29,6 @@ RUN	adduser -S tron -u 1000 -G root \
 USER tron
 
 # builds tron-full-node
-ENV TRON_VERSION=3.6.0
 ENV TRON_SOURCE_URL=https://github.com/tronprotocol/java-tron/archive/Odyssey-v${TRON_VERSION}.tar.gz
 ENV TRON_SOURCE_PATH=${TRON_PATH}/java-tron-Odyssey-v${TRON_VERSION}/
 RUN curl -L -O ${TRON_SOURCE_URL} \
