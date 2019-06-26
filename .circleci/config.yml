@@ -1,0 +1,31 @@
+---
+version: 2
+jobs:
+  docker-build-push:
+    docker:
+    - image: docker:stable
+    
+    steps:
+    - checkout
+
+    # sets docker up on circleci environment
+    - setup_remote_docker
+
+    # logs in to docker hub then
+    # build and push image to docker hub
+    - run: |
+        docker login -u $DOCKER_LOGIN -p $DOCKER_PWD > /dev/null 2>&1
+        docker build -t gettyio/tron-node:$CIRCLE_BRANCH .
+        docker push gettyio/tron-node:$CIRCLE_BRANCH
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+    - docker-build-push:
+        context: docker-hub-credentials
+        filters:
+          branches:
+            only:
+            - master
+            - development
