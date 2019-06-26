@@ -50,7 +50,7 @@ USER root
 # installs dependencies packages
 RUN apk update \
     && apk -U upgrade \
-    && apk add --no-cache --update libstdc++ ca-certificates \
+    && apk add --no-cache --update libstdc++ curl ca-certificates \
     && update-ca-certificates --fresh \
     && rm -rf /var/cache/apk/*
 
