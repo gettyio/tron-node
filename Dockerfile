@@ -62,8 +62,9 @@ USER tron
 
 COPY --from=build --chown=tron:root ${TRON_PATH}/FullNode.jar ${TRON_PATH}/SolidityNode.jar ${TRON_PATH}/
 
-COPY --chown=tron:root start.sh config.conf ./
-RUN	chmod +x ${TRON_PATH}/start.sh
+COPY --chown=tron:root start.sh ./
+RUN	chmod +x ${TRON_PATH}/start.sh \
+    && curl -LO https://raw.githubusercontent.com/tronprotocol/tron-deployment/master/main_net_config.conf
 
 ENTRYPOINT [ "sh" ]
 CMD [ "start.sh" ]
